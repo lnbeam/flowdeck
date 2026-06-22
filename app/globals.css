@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root,
+  .dark {
+    --background: 224 47% 5%;
+    --foreground: 213 31% 95%;
+
+    --card: 224 41% 7%;
+    --card-foreground: 213 31% 95%;
+
+    --popover: 224 45% 6%;
+    --popover-foreground: 213 31% 95%;
+
+    --primary: 152 70% 45%;
+    --primary-foreground: 224 47% 5%;
+
+    --secondary: 223 30% 14%;
+    --secondary-foreground: 213 31% 92%;
+
+    --muted: 223 28% 12%;
+    --muted-foreground: 215 20% 62%;
+
+    --accent: 223 30% 15%;
+    --accent-foreground: 213 31% 95%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222 30% 15%;
+    --input: 222 30% 16%;
+    --ring: 152 70% 45%;
+
+    --radius: 0.85rem;
+
+    /* Domain accents */
+    --hot: 351 95% 71%;
+    --warm: 38 95% 58%;
+    --cold: 199 89% 60%;
+    --live: 152 76% 50%;
+
+    /* Chart palette */
+    --chart-1: 152 70% 50%;
+    --chart-2: 199 89% 60%;
+    --chart-3: 38 95% 58%;
+    --chart-4: 351 95% 71%;
+    --chart-5: 263 70% 66%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image:
+      radial-gradient(60rem 60rem at 12% -10%, hsl(152 70% 45% / 0.07), transparent 60%),
+      radial-gradient(50rem 50rem at 100% 0%, hsl(199 89% 60% / 0.06), transparent 55%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .glass {
+    background: hsl(224 41% 7% / 0.7);
+    backdrop-filter: blur(10px);
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Slim, on-brand scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(222 30% 22%) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: hsl(222 30% 20%);
+  border-radius: 9999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: hsl(222 30% 28%);
+}
