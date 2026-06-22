@@ -8,7 +8,7 @@
 //   Webhook (POST /lead-intake) ─┐
 //   Schedule (every 1 min) → Generate Lead ─┤
 //        ├→ Score & Route Lead → POST to Dashboard (/api/ingest)
-//        │                     └→ Route by Tier (Switch) → Senior AE / SDR / Nurture (mocked, no real sends)
+//        │                     └→ Route by Tier (Switch) → Senior Advisor / SDR / Email nurture (mocked, no real sends)
 //
 // Env used by the workflow (set in n8n → Settings → Variables, or .env):
 //   DASHBOARD_URL  e.g. https://your-app.vercel.app   (no trailing slash)
@@ -25,33 +25,31 @@ const here = dirname(fileURLToPath(import.meta.url));
 // String.raw preserves regex/backslashes; the script contains no ${...}.
 // ---------------------------------------------------------------------------
 const generateLeadCode = String.raw`
-// Generate ONE synthetic lead (mock data only).
+// Generate ONE synthetic lead (mock data only) — coding-bootcamp funnel.
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 const FIRST = ['Maya','Liam','Sofia','Noah','Aria','Ethan','Zoe','Lucas','Nina','Omar','Elena','Kai','Priya','Mateo','Hana','Diego'];
 const LAST = ['Reed','Vance','Okoro','Holt','Marsh','Nguyen','Patel','Sterling','Khan','Rossi','Adler','Frost'];
-const HEAD = ['Northwind','Lumen','Cobalt','Aperture','Vertex','Helios','Granite','Tidal','Beacon','Quanta','Meridian','Arbor'];
-const TAIL = ['Labs','Systems','Group','Technologies','Works','Digital','Health','Capital','Logistics'];
-const SOURCES = [['Website Form','web'],['Pricing Page CTA','web'],['LinkedIn Ad','paid'],['Google Ads','paid'],['Partner Referral','referral'],['Organic Search','organic'],['Webinar Signup','organic'],['Cold Outbound Reply','outbound'],['Product Hunt','social']];
-const INTENTS = ['demo','pricing','evaluation','partnership','support','job','other'];
-const INDUSTRIES = ['SaaS','Fintech','Healthcare','Ecommerce','Manufacturing','Education','Agency','Logistics','Other'];
-const REGIONS = ['North America','Europe','UK & Ireland','APAC','LATAM','MENA'];
-const MESSAGES = ["We are evaluating tools to roll out this quarter, can we book a demo?","What does pricing look like for a team of {n}?","Interested in a partnership / reseller arrangement.","Need this urgently, we are migrating off a legacy system.","Just browsing, sending myself some info.","Do you integrate with our current stack?","Following up after the webinar, keen to see it in action.","Is there a free trial? Want to test before we commit."];
-function emp(){ const r = Math.random(); if (r < 0.42) return 5 + Math.floor(Math.random()*45); if (r < 0.72) return 50 + Math.floor(Math.random()*200); if (r < 0.9) return 250 + Math.floor(Math.random()*750); return 1000 + Math.floor(Math.random()*8000); }
-const first = pick(FIRST), last = pick(LAST), head = pick(HEAD), tail = pick(TAIL);
-const employees = emp();
+const PERSONAS = ['Career switcher','Recent grad','Self-taught dev','Junior developer','Marketing specialist','Product designer','Freelancer','University student','Bootcamp shopper','Data analyst'];
+const SOURCES = [['Landing Page','web'],['Free Trial Lesson','organic'],['Webinar Signup','webinar'],['Instagram Ad','paid'],['Google Ads','paid'],['YouTube Channel','organic'],['Student Referral','referral'],['Course Catalog','web'],['Product Hunt','social'],['Cold Email Reply','outbound']];
+const INTENTS = ['enroll-now','book-call','financing','pricing','syllabus','free-lesson','newsletter','browsing'];
+const PROGRAMS = ['Web Development','Data Science','DevOps','Cybersecurity','UX/UI Design','QA Automation','Digital Marketing','Intro to Coding'];
+const FORMATS = ['Full-time','Part-time','Evening','Weekend','Self-paced'];
+const MESSAGES = ["Ready to enroll in the next cohort, when does it start?","Do you offer a payment plan or financing?","Can I book a call with an advisor about the {p} track?","Just downloaded the syllabus, comparing options.","Is there a scholarship or discount for the {p} course?","Tried the free lesson, loved it. What is the tuition?","Still browsing a few bootcamps.","Career switcher here, will this help me get hired?","Signing up for the newsletter to learn more.","Need to start ASAP, can I join the current cohort?"];
+const DOMAINS = ['gmail.com','outlook.com','icloud.com','proton.me'];
+function visits(){ const r = Math.random(); if (r < 0.45) return 1 + Math.floor(Math.random()*2); if (r < 0.78) return 2 + Math.floor(Math.random()*3); if (r < 0.93) return 4 + Math.floor(Math.random()*4); return 8 + Math.floor(Math.random()*7); }
+const first = pick(FIRST), last = pick(LAST), program = pick(PROGRAMS);
 const src = pick(SOURCES);
-const domain = Math.random() < 0.25 ? pick(['gmail.com','outlook.com','yahoo.com']) : (head.toLowerCase() + '.com');
 const lead = {
   name: first + ' ' + last,
-  email: (first.toLowerCase() + '.' + last.toLowerCase() + '@' + domain),
-  company: head + ' ' + tail,
+  email: (first.toLowerCase() + '.' + last.toLowerCase() + '@' + pick(DOMAINS)),
+  company: pick(PERSONAS),
   source: src[0],
   channel: src[1],
-  message: pick(MESSAGES).replace('{n}', String(employees)),
+  message: pick(MESSAGES).replace('{p}', program),
   intent: pick(INTENTS),
-  industry: pick(INDUSTRIES),
-  region: pick(REGIONS),
-  employees: employees,
+  industry: program,
+  region: pick(FORMATS),
+  employees: visits(),
   simulated: true,
 };
 return [{ json: lead }];
@@ -62,46 +60,46 @@ return [{ json: lead }];
 // ---------------------------------------------------------------------------
 const scoreRouteCode = String.raw`
 // Lead scoring + routing — same rules as the dashboard's lib/scoring.ts.
-const INTENT = { demo:30, pricing:20, partnership:16, evaluation:24, support:2, job:-10, other:4 };
-const CHANNEL = { referral:14, organic:9, paid:6, social:4, web:1, outbound:5 };
-const INDUSTRY = { SaaS:8, Fintech:10, Healthcare:8, Ecommerce:6, Manufacturing:5, Education:3, Agency:4, Logistics:5, Other:2 };
-function sizeW(e){ if (e >= 1000) return 22; if (e >= 250) return 16; if (e >= 50) return 10; if (e >= 10) return 5; return 1; }
+// Field re-use: intent = lead action, channel = acquisition channel,
+// industry = course/program, employees = number of site visits.
+const INTENT = { 'enroll-now':32, 'book-call':26, financing:22, pricing:20, syllabus:14, 'free-lesson':12, newsletter:4, browsing:2 };
+const CHANNEL = { referral:16, webinar:12, organic:9, paid:6, outbound:5, social:4, web:1 };
+const PROGRAM = { 'Data Science':10, Cybersecurity:9, DevOps:9, 'Web Development':8, 'UX/UI Design':6, 'QA Automation':6, 'Digital Marketing':4, 'Intro to Coding':2 };
+const PRICE = { 'Data Science':3000, Cybersecurity:2900, DevOps:2800, 'Web Development':2500, 'UX/UI Design':2200, 'QA Automation':2000, 'Digital Marketing':1500, 'Intro to Coding':500 };
+function engW(v){ if (v >= 8) return 22; if (v >= 4) return 16; if (v >= 2) return 10; if (v >= 1) return 5; return 1; }
 
 const out = [];
 for (const item of $input.all()) {
   // Webhook payloads arrive under .body; the Schedule path is already flat.
   const inc = (item.json && item.json.body) ? item.json.body : item.json;
 
-  const intent = String(inc.intent || 'other').toLowerCase();
+  const intent = String(inc.intent || 'browsing').toLowerCase();
   const channel = String(inc.channel || 'web').toLowerCase();
-  const industry = inc.industry || 'Other';
-  const employees = Number(inc.employees) || 1;
+  const program = inc.industry || 'Intro to Coding';
+  const visits = Number(inc.employees) || 1;
 
   let score = 10;
-  score += (INTENT[intent] != null ? INTENT[intent] : INTENT.other);
+  score += (INTENT[intent] != null ? INTENT[intent] : INTENT.browsing);
   score += (CHANNEL[channel] != null ? CHANNEL[channel] : CHANNEL.web);
-  score += (INDUSTRY[industry] != null ? INDUSTRY[industry] : INDUSTRY.Other);
-  score += sizeW(employees);
-
-  const email = String(inc.email || '').toLowerCase();
-  const freemail = /@(gmail|yahoo|hotmail|outlook|icloud|proton)\./.test(email);
-  if (email.indexOf('@') !== -1 && !freemail) score += 6;
+  score += (PROGRAM[program] != null ? PROGRAM[program] : 2);
+  score += engW(visits);
 
   const msg = String(inc.message || '').toLowerCase();
-  if (/(budget|urgent|asap|this quarter|q[1-4]|rolling out|migrate)/.test(msg)) score += 5;
+  if (/(payment plan|installment|financing|scholarship|discount|tuition)/.test(msg)) score += 6;
+  if (/(enroll|sign up|start date|cohort|ready|asap|join)/.test(msg)) score += 5;
 
   score = Math.max(1, Math.min(100, Math.round(score)));
   const tier = score >= 70 ? 'hot' : score >= 45 ? 'warm' : 'cold';
-  const routedTo = tier === 'hot' ? 'Sales · Senior AE (priority)' : tier === 'warm' ? 'Sales · SDR queue' : 'Marketing · Nurture sequence';
+  const routedTo = tier === 'hot' ? 'Admissions · Senior Advisor (book a call)' : tier === 'warm' ? 'Admissions · SDR nurture call' : 'Marketing · Email nurture sequence';
 
-  const sizeFactor = Math.max(1, Math.log10(employees + 1));
-  const intentFactor = tier === 'hot' ? 1.6 : tier === 'warm' ? 1.0 : 0.55;
-  const estValue = Math.round((1200 * sizeFactor * intentFactor) / 50) * 50;
+  const price = (PRICE[program] != null ? PRICE[program] : 1500);
+  const closeFactor = tier === 'hot' ? 1.0 : tier === 'warm' ? 0.5 : 0.2;
+  const estValue = Math.round((price * closeFactor) / 50) * 50;
 
   out.push({ json: Object.assign({}, inc, {
-    intent, channel, industry, employees, score, tier, routedTo, estValue,
+    intent, channel, industry: program, employees: visits, score, tier, routedTo, estValue,
     workflow: {
-      name: 'Lead Intake & Routing',
+      name: 'Lead Capture & Routing',
       executionId: 'exec_' + Math.random().toString(36).slice(2, 8),
       status: 'success',
       durationMs: Math.round(320 + Math.random() * 1500),
@@ -112,7 +110,7 @@ return out;
 `.trim();
 
 const stickyContent = [
-  "## Lead Intake & Routing",
+  "## Lead Capture & Routing (bootcamp admissions)",
   "",
   "Two entry points → score → POST to the dashboard.",
   "",
@@ -120,7 +118,7 @@ const stickyContent = [
   "- `DASHBOARD_URL` — e.g. https://your-app.vercel.app",
   "- `INGEST_TOKEN` — must match the dashboard",
   "",
-  "Routing nodes (Senior AE / SDR / Nurture) are **mocked** — no real emails are sent.",
+  "Routing nodes (Senior Advisor / SDR / Email nurture) are **mocked** — no real emails are sent.",
 ].join("\n");
 
 function tierRule(value, key) {
@@ -232,7 +230,7 @@ const nodes = [
   {
     parameters: {},
     id: "noop-hot",
-    name: "→ Senior AE (CRM)",
+    name: "→ Senior Advisor",
     type: "n8n-nodes-base.noOp",
     typeVersion: 1,
     position: [1220, 140],
@@ -240,7 +238,7 @@ const nodes = [
   {
     parameters: {},
     id: "noop-warm",
-    name: "→ SDR Queue",
+    name: "→ SDR Nurture",
     type: "n8n-nodes-base.noOp",
     typeVersion: 1,
     position: [1220, 240],
@@ -248,7 +246,7 @@ const nodes = [
   {
     parameters: {},
     id: "noop-cold",
-    name: "→ Marketing Nurture",
+    name: "→ Email Nurture",
     type: "n8n-nodes-base.noOp",
     typeVersion: 1,
     position: [1220, 340],
@@ -275,15 +273,15 @@ const connections = {
   },
   "Route by Tier": {
     main: [
-      [{ node: "→ Senior AE (CRM)", type: "main", index: 0 }],
-      [{ node: "→ SDR Queue", type: "main", index: 0 }],
-      [{ node: "→ Marketing Nurture", type: "main", index: 0 }],
+      [{ node: "→ Senior Advisor", type: "main", index: 0 }],
+      [{ node: "→ SDR Nurture", type: "main", index: 0 }],
+      [{ node: "→ Email Nurture", type: "main", index: 0 }],
     ],
   },
 };
 
 const workflow = {
-  name: "Lead Intake & Routing",
+  name: "Lead Capture & Routing",
   nodes,
   connections,
   active: false,

@@ -1,9 +1,9 @@
 {
-  "name": "Lead Intake & Routing",
+  "name": "Lead Capture & Routing",
   "nodes": [
     {
       "parameters": {
-        "content": "## Lead Intake & Routing\n\nTwo entry points → score → POST to the dashboard.\n\n**Set these env vars** (Settings → Variables):\n- `DASHBOARD_URL` — e.g. https://your-app.vercel.app\n- `INGEST_TOKEN` — must match the dashboard\n\nRouting nodes (Senior AE / SDR / Nurture) are **mocked** — no real emails are sent.",
+        "content": "## Lead Capture & Routing (bootcamp admissions)\n\nTwo entry points → score → POST to the dashboard.\n\n**Set these env vars** (Settings → Variables):\n- `DASHBOARD_URL` — e.g. https://your-app.vercel.app\n- `INGEST_TOKEN` — must match the dashboard\n\nRouting nodes (Senior Advisor / SDR / Email nurture) are **mocked** — no real emails are sent.",
         "height": 260,
         "width": 320
       },
@@ -55,7 +55,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Generate ONE synthetic lead (mock data only).\nconst pick = (a) => a[Math.floor(Math.random() * a.length)];\nconst FIRST = ['Maya','Liam','Sofia','Noah','Aria','Ethan','Zoe','Lucas','Nina','Omar','Elena','Kai','Priya','Mateo','Hana','Diego'];\nconst LAST = ['Reed','Vance','Okoro','Holt','Marsh','Nguyen','Patel','Sterling','Khan','Rossi','Adler','Frost'];\nconst HEAD = ['Northwind','Lumen','Cobalt','Aperture','Vertex','Helios','Granite','Tidal','Beacon','Quanta','Meridian','Arbor'];\nconst TAIL = ['Labs','Systems','Group','Technologies','Works','Digital','Health','Capital','Logistics'];\nconst SOURCES = [['Website Form','web'],['Pricing Page CTA','web'],['LinkedIn Ad','paid'],['Google Ads','paid'],['Partner Referral','referral'],['Organic Search','organic'],['Webinar Signup','organic'],['Cold Outbound Reply','outbound'],['Product Hunt','social']];\nconst INTENTS = ['demo','pricing','evaluation','partnership','support','job','other'];\nconst INDUSTRIES = ['SaaS','Fintech','Healthcare','Ecommerce','Manufacturing','Education','Agency','Logistics','Other'];\nconst REGIONS = ['North America','Europe','UK & Ireland','APAC','LATAM','MENA'];\nconst MESSAGES = [\"We are evaluating tools to roll out this quarter, can we book a demo?\",\"What does pricing look like for a team of {n}?\",\"Interested in a partnership / reseller arrangement.\",\"Need this urgently, we are migrating off a legacy system.\",\"Just browsing, sending myself some info.\",\"Do you integrate with our current stack?\",\"Following up after the webinar, keen to see it in action.\",\"Is there a free trial? Want to test before we commit.\"];\nfunction emp(){ const r = Math.random(); if (r < 0.42) return 5 + Math.floor(Math.random()*45); if (r < 0.72) return 50 + Math.floor(Math.random()*200); if (r < 0.9) return 250 + Math.floor(Math.random()*750); return 1000 + Math.floor(Math.random()*8000); }\nconst first = pick(FIRST), last = pick(LAST), head = pick(HEAD), tail = pick(TAIL);\nconst employees = emp();\nconst src = pick(SOURCES);\nconst domain = Math.random() < 0.25 ? pick(['gmail.com','outlook.com','yahoo.com']) : (head.toLowerCase() + '.com');\nconst lead = {\n  name: first + ' ' + last,\n  email: (first.toLowerCase() + '.' + last.toLowerCase() + '@' + domain),\n  company: head + ' ' + tail,\n  source: src[0],\n  channel: src[1],\n  message: pick(MESSAGES).replace('{n}', String(employees)),\n  intent: pick(INTENTS),\n  industry: pick(INDUSTRIES),\n  region: pick(REGIONS),\n  employees: employees,\n  simulated: true,\n};\nreturn [{ json: lead }];"
+        "jsCode": "// Generate ONE synthetic lead (mock data only) — coding-bootcamp funnel.\nconst pick = (a) => a[Math.floor(Math.random() * a.length)];\nconst FIRST = ['Maya','Liam','Sofia','Noah','Aria','Ethan','Zoe','Lucas','Nina','Omar','Elena','Kai','Priya','Mateo','Hana','Diego'];\nconst LAST = ['Reed','Vance','Okoro','Holt','Marsh','Nguyen','Patel','Sterling','Khan','Rossi','Adler','Frost'];\nconst PERSONAS = ['Career switcher','Recent grad','Self-taught dev','Junior developer','Marketing specialist','Product designer','Freelancer','University student','Bootcamp shopper','Data analyst'];\nconst SOURCES = [['Landing Page','web'],['Free Trial Lesson','organic'],['Webinar Signup','webinar'],['Instagram Ad','paid'],['Google Ads','paid'],['YouTube Channel','organic'],['Student Referral','referral'],['Course Catalog','web'],['Product Hunt','social'],['Cold Email Reply','outbound']];\nconst INTENTS = ['enroll-now','book-call','financing','pricing','syllabus','free-lesson','newsletter','browsing'];\nconst PROGRAMS = ['Web Development','Data Science','DevOps','Cybersecurity','UX/UI Design','QA Automation','Digital Marketing','Intro to Coding'];\nconst FORMATS = ['Full-time','Part-time','Evening','Weekend','Self-paced'];\nconst MESSAGES = [\"Ready to enroll in the next cohort, when does it start?\",\"Do you offer a payment plan or financing?\",\"Can I book a call with an advisor about the {p} track?\",\"Just downloaded the syllabus, comparing options.\",\"Is there a scholarship or discount for the {p} course?\",\"Tried the free lesson, loved it. What is the tuition?\",\"Still browsing a few bootcamps.\",\"Career switcher here, will this help me get hired?\",\"Signing up for the newsletter to learn more.\",\"Need to start ASAP, can I join the current cohort?\"];\nconst DOMAINS = ['gmail.com','outlook.com','icloud.com','proton.me'];\nfunction visits(){ const r = Math.random(); if (r < 0.45) return 1 + Math.floor(Math.random()*2); if (r < 0.78) return 2 + Math.floor(Math.random()*3); if (r < 0.93) return 4 + Math.floor(Math.random()*4); return 8 + Math.floor(Math.random()*7); }\nconst first = pick(FIRST), last = pick(LAST), program = pick(PROGRAMS);\nconst src = pick(SOURCES);\nconst lead = {\n  name: first + ' ' + last,\n  email: (first.toLowerCase() + '.' + last.toLowerCase() + '@' + pick(DOMAINS)),\n  company: pick(PERSONAS),\n  source: src[0],\n  channel: src[1],\n  message: pick(MESSAGES).replace('{p}', program),\n  intent: pick(INTENTS),\n  industry: program,\n  region: pick(FORMATS),\n  employees: visits(),\n  simulated: true,\n};\nreturn [{ json: lead }];"
       },
       "id": "gen-1",
       "name": "Generate Lead (mock)",
@@ -68,7 +68,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Lead scoring + routing — same rules as the dashboard's lib/scoring.ts.\nconst INTENT = { demo:30, pricing:20, partnership:16, evaluation:24, support:2, job:-10, other:4 };\nconst CHANNEL = { referral:14, organic:9, paid:6, social:4, web:1, outbound:5 };\nconst INDUSTRY = { SaaS:8, Fintech:10, Healthcare:8, Ecommerce:6, Manufacturing:5, Education:3, Agency:4, Logistics:5, Other:2 };\nfunction sizeW(e){ if (e >= 1000) return 22; if (e >= 250) return 16; if (e >= 50) return 10; if (e >= 10) return 5; return 1; }\n\nconst out = [];\nfor (const item of $input.all()) {\n  // Webhook payloads arrive under .body; the Schedule path is already flat.\n  const inc = (item.json && item.json.body) ? item.json.body : item.json;\n\n  const intent = String(inc.intent || 'other').toLowerCase();\n  const channel = String(inc.channel || 'web').toLowerCase();\n  const industry = inc.industry || 'Other';\n  const employees = Number(inc.employees) || 1;\n\n  let score = 10;\n  score += (INTENT[intent] != null ? INTENT[intent] : INTENT.other);\n  score += (CHANNEL[channel] != null ? CHANNEL[channel] : CHANNEL.web);\n  score += (INDUSTRY[industry] != null ? INDUSTRY[industry] : INDUSTRY.Other);\n  score += sizeW(employees);\n\n  const email = String(inc.email || '').toLowerCase();\n  const freemail = /@(gmail|yahoo|hotmail|outlook|icloud|proton)\\./.test(email);\n  if (email.indexOf('@') !== -1 && !freemail) score += 6;\n\n  const msg = String(inc.message || '').toLowerCase();\n  if (/(budget|urgent|asap|this quarter|q[1-4]|rolling out|migrate)/.test(msg)) score += 5;\n\n  score = Math.max(1, Math.min(100, Math.round(score)));\n  const tier = score >= 70 ? 'hot' : score >= 45 ? 'warm' : 'cold';\n  const routedTo = tier === 'hot' ? 'Sales · Senior AE (priority)' : tier === 'warm' ? 'Sales · SDR queue' : 'Marketing · Nurture sequence';\n\n  const sizeFactor = Math.max(1, Math.log10(employees + 1));\n  const intentFactor = tier === 'hot' ? 1.6 : tier === 'warm' ? 1.0 : 0.55;\n  const estValue = Math.round((1200 * sizeFactor * intentFactor) / 50) * 50;\n\n  out.push({ json: Object.assign({}, inc, {\n    intent, channel, industry, employees, score, tier, routedTo, estValue,\n    workflow: {\n      name: 'Lead Intake & Routing',\n      executionId: 'exec_' + Math.random().toString(36).slice(2, 8),\n      status: 'success',\n      durationMs: Math.round(320 + Math.random() * 1500),\n    },\n  }) });\n}\nreturn out;"
+        "jsCode": "// Lead scoring + routing — same rules as the dashboard's lib/scoring.ts.\n// Field re-use: intent = lead action, channel = acquisition channel,\n// industry = course/program, employees = number of site visits.\nconst INTENT = { 'enroll-now':32, 'book-call':26, financing:22, pricing:20, syllabus:14, 'free-lesson':12, newsletter:4, browsing:2 };\nconst CHANNEL = { referral:16, webinar:12, organic:9, paid:6, outbound:5, social:4, web:1 };\nconst PROGRAM = { 'Data Science':10, Cybersecurity:9, DevOps:9, 'Web Development':8, 'UX/UI Design':6, 'QA Automation':6, 'Digital Marketing':4, 'Intro to Coding':2 };\nconst PRICE = { 'Data Science':3000, Cybersecurity:2900, DevOps:2800, 'Web Development':2500, 'UX/UI Design':2200, 'QA Automation':2000, 'Digital Marketing':1500, 'Intro to Coding':500 };\nfunction engW(v){ if (v >= 8) return 22; if (v >= 4) return 16; if (v >= 2) return 10; if (v >= 1) return 5; return 1; }\n\nconst out = [];\nfor (const item of $input.all()) {\n  // Webhook payloads arrive under .body; the Schedule path is already flat.\n  const inc = (item.json && item.json.body) ? item.json.body : item.json;\n\n  const intent = String(inc.intent || 'browsing').toLowerCase();\n  const channel = String(inc.channel || 'web').toLowerCase();\n  const program = inc.industry || 'Intro to Coding';\n  const visits = Number(inc.employees) || 1;\n\n  let score = 10;\n  score += (INTENT[intent] != null ? INTENT[intent] : INTENT.browsing);\n  score += (CHANNEL[channel] != null ? CHANNEL[channel] : CHANNEL.web);\n  score += (PROGRAM[program] != null ? PROGRAM[program] : 2);\n  score += engW(visits);\n\n  const msg = String(inc.message || '').toLowerCase();\n  if (/(payment plan|installment|financing|scholarship|discount|tuition)/.test(msg)) score += 6;\n  if (/(enroll|sign up|start date|cohort|ready|asap|join)/.test(msg)) score += 5;\n\n  score = Math.max(1, Math.min(100, Math.round(score)));\n  const tier = score >= 70 ? 'hot' : score >= 45 ? 'warm' : 'cold';\n  const routedTo = tier === 'hot' ? 'Admissions · Senior Advisor (book a call)' : tier === 'warm' ? 'Admissions · SDR nurture call' : 'Marketing · Email nurture sequence';\n\n  const price = (PRICE[program] != null ? PRICE[program] : 1500);\n  const closeFactor = tier === 'hot' ? 1.0 : tier === 'warm' ? 0.5 : 0.2;\n  const estValue = Math.round((price * closeFactor) / 50) * 50;\n\n  out.push({ json: Object.assign({}, inc, {\n    intent, channel, industry: program, employees: visits, score, tier, routedTo, estValue,\n    workflow: {\n      name: 'Lead Capture & Routing',\n      executionId: 'exec_' + Math.random().toString(36).slice(2, 8),\n      status: 'success',\n      durationMs: Math.round(320 + Math.random() * 1500),\n    },\n  }) });\n}\nreturn out;"
       },
       "id": "score-1",
       "name": "Score & Route Lead",
@@ -195,7 +195,7 @@
     {
       "parameters": {},
       "id": "noop-hot",
-      "name": "→ Senior AE (CRM)",
+      "name": "→ Senior Advisor",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
@@ -206,7 +206,7 @@
     {
       "parameters": {},
       "id": "noop-warm",
-      "name": "→ SDR Queue",
+      "name": "→ SDR Nurture",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
@@ -217,7 +217,7 @@
     {
       "parameters": {},
       "id": "noop-cold",
-      "name": "→ Marketing Nurture",
+      "name": "→ Email Nurture",
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
@@ -280,21 +280,21 @@
       "main": [
         [
           {
-            "node": "→ Senior AE (CRM)",
+            "node": "→ Senior Advisor",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "→ SDR Queue",
+            "node": "→ SDR Nurture",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "→ Marketing Nurture",
+            "node": "→ Email Nurture",
             "type": "main",
             "index": 0
           }

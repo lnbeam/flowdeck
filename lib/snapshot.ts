@@ -74,7 +74,7 @@ export function buildSnapshot(input: LeadEvent[], now = Date.now()): SnapshotRes
     status: e.workflow.status,
     durationMs: e.workflow.durationMs,
     ts: e.ts,
-    label: `${e.company} · ${e.tier.toUpperCase()}`,
+    label: `${e.industry} · ${e.tier.toUpperCase()}`,
     node: e.workflow.node,
   }));
 

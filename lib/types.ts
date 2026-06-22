@@ -56,7 +56,7 @@ export interface KpiBlock {
 
 export interface SnapshotResponse {
   generatedAt: number;
-  backend: "upstash" | "memory";
+  backend: "memory";
   kpis: KpiBlock;
   tiers: { hot: number; warm: number; cold: number };
   sources: { label: string; count: number }[];

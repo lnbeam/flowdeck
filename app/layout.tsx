@@ -15,10 +15,14 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FlowDeck — Lead Intake Command Center",
+  title: "EnrollDeck — Admissions Command Center",
   description:
-    "A live dashboard wired to an n8n automation workflow: lead scoring, routing, and execution health.",
+    "A live dashboard wired to an n8n automation workflow: coding-bootcamp lead scoring, routing, and execution health.",
 };
+
+// Set the theme class before paint to avoid a flash of the wrong theme (FOUC).
+// Default is dark; an explicit "light" choice is persisted in localStorage.
+const themeScript = `(function(){try{var t=localStorage.getItem('flowdeck-theme');if(t==='light'){document.documentElement.classList.remove('dark');}else{document.documentElement.classList.add('dark');}}catch(e){document.documentElement.classList.add('dark');}})();`;
 
 export default function RootLayout({
   children,
@@ -26,7 +30,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${mono.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

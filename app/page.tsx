@@ -105,7 +105,7 @@ export default function Page() {
                 </Panel>
               </Reveal>
               <Reveal delay={0.15} className="lg:col-span-4">
-                <Panel title="Tier mix & routing">
+                <Panel title="Lead tier & routing">
                   <TierDonut tiers={data.tiers} />
                 </Panel>
               </Reveal>
@@ -142,7 +142,7 @@ export default function Page() {
                   </Panel>
                 </Reveal>
                 <Reveal delay={0.2}>
-                  <Panel title="Score distribution">
+                  <Panel title="Lead score distribution">
                     <ScoreFunnel bands={data.scoreBands} />
                   </Panel>
                 </Reveal>
@@ -167,7 +167,7 @@ export default function Page() {
 
             <footer className="flex flex-wrap items-center justify-between gap-2 pt-2 text-[11px] text-muted-foreground">
               <span>
-                FlowDeck · mock data only · traffic = built-in simulator + real n8n
+                EnrollDeck · mock data only · traffic = built-in simulator + real n8n
                 ingest
               </span>
               <span>

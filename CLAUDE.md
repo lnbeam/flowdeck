@@ -4,6 +4,12 @@ A short, high-quality prototype for a "Senior Automation" task: a **visually pol
 dashboard wired to a real n8n automation workflow**, with a live (or simulated-live)
 connection, deployed publicly (Vercel).
 
+**Current concept:** *EnrollDeck* — a coding-bootcamp **admissions lead funnel**.
+Prospective-student leads are scored 0–100 by enrollment intent → classified
+Hot/Warm/Cold → routed to Senior Advisor / SDR nurture / Email nurture. Same polarity
+as a sales funnel (higher score = hotter buyer). Scoring lives in `lib/scoring.ts` and
+is mirrored byte-for-byte in the n8n Code node (`n8n/build-workflow.mjs`).
+
 ## Goal / deliverables
 
 - Polished dashboard / internal-tool UI.
@@ -17,7 +23,9 @@ connection, deployed publicly (Vercel).
 ## Stack (intended)
 
 - **Dashboard:** Next.js (App Router) + TypeScript, deployed on **Vercel**.
-- **Store:** Upstash Redis (REST) on prod; in-memory fallback for local dev.
+- **Store:** in-memory, process-local (no external service). On serverless this is
+  per-instance / ephemeral — fine for the prototype; `lib/store.ts` keeps an async
+  API so a real store could drop in later.
 - **Automation:** n8n (run locally via Docker for the demo; export JSON committed).
 - Connection: n8n → `POST /api/ingest` (shared `x-ingest-token`). A built-in
   simulator keeps the deployed URL alive when n8n isn't actively firing.
@@ -29,8 +37,8 @@ connection, deployed publicly (Vercel).
 
 - Engineering mode: concise, no role-play. Verify changes (`npm run build`) before
   claiming done. Use mock data only.
-- Commit/push only when asked. If deploying, the Vercel login + Upstash DB creation
-  are the user's steps (no credentials are taken).
+- Commit/push only when asked. If deploying, the Vercel login is the user's step
+  (no credentials are taken). No external store to provision.
 
 ## Available subagents (`.claude/agents/`)
 

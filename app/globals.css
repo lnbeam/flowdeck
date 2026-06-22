@@ -3,8 +3,67 @@
 @tailwind utilities;
 
 @layer base {
-  :root,
+  /* Light theme (default :root) */
+  :root {
+    color-scheme: light;
+
+    --background: 210 40% 98%;
+    --foreground: 224 47% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 224 47% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 47% 12%;
+
+    --primary: 152 62% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 22% 93%;
+    --secondary-foreground: 224 35% 20%;
+
+    --muted: 220 20% 95%;
+    --muted-foreground: 220 12% 42%;
+
+    --accent: 220 22% 91%;
+    --accent-foreground: 224 35% 18%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 18% 88%;
+    --input: 220 18% 85%;
+    --ring: 152 62% 38%;
+
+    --radius: 0.85rem;
+
+    /* Domain accents — darkened for contrast on a light surface */
+    --hot: 351 78% 52%;
+    --warm: 38 90% 42%;
+    --cold: 199 85% 42%;
+    --live: 152 62% 36%;
+
+    /* Chart palette */
+    --chart-1: 152 60% 40%;
+    --chart-2: 199 80% 46%;
+    --chart-3: 38 88% 46%;
+    --chart-4: 351 75% 56%;
+    --chart-5: 263 60% 56%;
+
+    /* Theme-dependent surface treatments */
+    --app-gradient:
+      radial-gradient(60rem 60rem at 12% -10%, hsl(152 70% 45% / 0.06), transparent 60%),
+      radial-gradient(50rem 50rem at 100% 0%, hsl(199 89% 60% / 0.05), transparent 55%);
+    --glass: 0 0% 100%;
+    --card-shadow: 0 1px 2px 0 hsl(220 20% 50% / 0.08), 0 10px 28px -18px hsl(220 30% 35% / 0.22);
+    --scrollbar-thumb: 220 14% 78%;
+    --scrollbar-thumb-hover: 220 14% 68%;
+  }
+
+  /* Dark theme */
   .dark {
+    color-scheme: dark;
+
     --background: 224 47% 5%;
     --foreground: 213 31% 95%;
 
@@ -33,8 +92,6 @@
     --input: 222 30% 16%;
     --ring: 152 70% 45%;
 
-    --radius: 0.85rem;
-
     /* Domain accents */
     --hot: 351 95% 71%;
     --warm: 38 95% 58%;
@@ -47,6 +104,15 @@
     --chart-3: 38 95% 58%;
     --chart-4: 351 95% 71%;
     --chart-5: 263 70% 66%;
+
+    /* Theme-dependent surface treatments */
+    --app-gradient:
+      radial-gradient(60rem 60rem at 12% -10%, hsl(152 70% 45% / 0.07), transparent 60%),
+      radial-gradient(50rem 50rem at 100% 0%, hsl(199 89% 60% / 0.06), transparent 55%);
+    --glass: 224 41% 7%;
+    --card-shadow: 0 1px 0 0 hsl(0 0% 100% / 0.03) inset, 0 8px 30px -12px rgba(0, 0, 0, 0.6);
+    --scrollbar-thumb: 222 30% 20%;
+    --scrollbar-thumb-hover: 222 30% 28%;
   }
 }
 
@@ -54,14 +120,9 @@
   * {
     @apply border-border;
   }
-  html {
-    color-scheme: dark;
-  }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background-image:
-      radial-gradient(60rem 60rem at 12% -10%, hsl(152 70% 45% / 0.07), transparent 60%),
-      radial-gradient(50rem 50rem at 100% 0%, hsl(199 89% 60% / 0.06), transparent 55%);
+    background-image: var(--app-gradient);
     background-attachment: fixed;
   }
 }
@@ -72,7 +133,7 @@
     font-feature-settings: "tnum";
   }
   .glass {
-    background: hsl(224 41% 7% / 0.7);
+    background: hsl(var(--glass) / 0.7);
     backdrop-filter: blur(10px);
   }
   .text-balance {
@@ -83,16 +144,16 @@
 /* Slim, on-brand scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: hsl(222 30% 22%) transparent;
+  scrollbar-color: hsl(var(--scrollbar-thumb)) transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: hsl(222 30% 20%);
+  background: hsl(var(--scrollbar-thumb));
   border-radius: 9999px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: hsl(222 30% 28%);
+  background: hsl(var(--scrollbar-thumb-hover));
 }

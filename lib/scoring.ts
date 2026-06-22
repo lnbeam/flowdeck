@@ -1,51 +1,72 @@
 import type { LeadEvent, RawLead, Tier } from "./types";
 
 /**
- * Lead scoring + routing engine.
+ * Lead scoring + routing engine — coding-bootcamp admissions funnel.
+ *
+ * A prospective student (lead) is scored 0–100 by purchase/enrollment intent,
+ * then classified Hot / Warm / Cold and routed to the right destination.
  *
  * This is intentionally a pure, dependency-free function so the EXACT same
  * logic can live in three places and always agree:
  *   1. The n8n "Score & Route Lead" Code node (see n8n/lead-intake-workflow.json)
  *   2. The server-side simulator (/api/simulate)
  *   3. A defensive re-score in /api/ingest if a raw lead arrives unscored
+ *
+ * Field re-use note: the data model keeps generic names — `intent` = the lead's
+ * action, `channel` = acquisition channel, `industry` = course/program of
+ * interest, `employees` = number of site visits/touchpoints.
  */
 
 const INTENT_WEIGHT: Record<string, number> = {
-  demo: 30,
+  "enroll-now": 32,
+  "book-call": 26,
+  financing: 22,
   pricing: 20,
-  partnership: 16,
-  evaluation: 24,
-  support: 2,
-  job: -10,
-  other: 4,
+  syllabus: 14,
+  "free-lesson": 12,
+  newsletter: 4,
+  browsing: 2,
 };
 
 const CHANNEL_WEIGHT: Record<string, number> = {
-  referral: 14,
+  referral: 16,
+  webinar: 12,
   organic: 9,
   paid: 6,
+  outbound: 5,
   social: 4,
   web: 1,
-  outbound: 5,
 };
 
-const INDUSTRY_WEIGHT: Record<string, number> = {
-  SaaS: 8,
-  Fintech: 10,
-  Healthcare: 8,
-  Ecommerce: 6,
-  Manufacturing: 5,
-  Education: 3,
-  Agency: 4,
-  Logistics: 5,
-  Other: 2,
+const PROGRAM_WEIGHT: Record<string, number> = {
+  "Data Science": 10,
+  Cybersecurity: 9,
+  DevOps: 9,
+  "Web Development": 8,
+  "UX/UI Design": 6,
+  "QA Automation": 6,
+  "Digital Marketing": 4,
+  "Intro to Coding": 2,
 };
 
-function sizeWeight(employees: number): number {
-  if (employees >= 1000) return 22;
-  if (employees >= 250) return 16;
-  if (employees >= 50) return 10;
-  if (employees >= 10) return 5;
+// Sticker price per program — drives the estimated (probability-weighted) value.
+const PROGRAM_PRICE: Record<string, number> = {
+  "Data Science": 3000,
+  Cybersecurity: 2900,
+  DevOps: 2800,
+  "Web Development": 2500,
+  "UX/UI Design": 2200,
+  "QA Automation": 2000,
+  "Digital Marketing": 1500,
+  "Intro to Coding": 500,
+};
+
+// More site visits / touchpoints → warmer lead.
+function engagementWeight(visits: number): number {
+  if (visits >= 8) return 22;
+  if (visits >= 4) return 16;
+  if (visits >= 2) return 10;
+  if (visits >= 1) return 5;
   return 1;
 }
 
@@ -63,41 +84,40 @@ export function tierFor(score: number): Tier {
 }
 
 export function routeFor(tier: Tier): string {
-  if (tier === "hot") return "Sales · Senior AE (priority)";
-  if (tier === "warm") return "Sales · SDR queue";
-  return "Marketing · Nurture sequence";
+  if (tier === "hot") return "Admissions · Senior Advisor (book a call)";
+  if (tier === "warm") return "Admissions · SDR nurture call";
+  return "Marketing · Email nurture sequence";
 }
 
 export function scoreLead(lead: RawLead): ScoreResult {
-  const intent = (lead.intent ?? "other").toLowerCase();
+  const intent = (lead.intent ?? "browsing").toLowerCase();
   const channel = (lead.channel ?? "web").toLowerCase();
-  const industry = lead.industry ?? "Other";
-  const employees = lead.employees ?? 1;
+  const program = lead.industry ?? "Intro to Coding";
+  const visits = lead.employees ?? 1;
 
   let score = 10; // baseline
-  score += INTENT_WEIGHT[intent] ?? INTENT_WEIGHT.other;
+  score += INTENT_WEIGHT[intent] ?? INTENT_WEIGHT.browsing;
   score += CHANNEL_WEIGHT[channel] ?? CHANNEL_WEIGHT.web;
-  score += INDUSTRY_WEIGHT[industry] ?? INDUSTRY_WEIGHT.Other;
-  score += sizeWeight(employees);
+  score += PROGRAM_WEIGHT[program] ?? 2;
+  score += engagementWeight(visits);
 
-  // Business-email bonus (not a free webmail provider).
-  const email = (lead.email ?? "").toLowerCase();
-  const freemail = /@(gmail|yahoo|hotmail|outlook|icloud|proton)\./.test(email);
-  if (email.includes("@") && !freemail) score += 6;
-
-  // Buying-signal keywords in the message.
   const msg = (lead.message ?? "").toLowerCase();
-  if (/(budget|urgent|asap|this quarter|q[1-4]|rolling out|migrate)/.test(msg)) {
+  // Financing / scholarship interest is a strong buying signal.
+  if (/(payment plan|installment|financing|scholarship|discount|tuition)/.test(msg)) {
+    score += 6;
+  }
+  // Explicit enrollment-intent keywords.
+  if (/(enroll|sign up|start date|cohort|ready|asap|join)/.test(msg)) {
     score += 5;
   }
 
   score = Math.max(1, Math.min(100, Math.round(score)));
   const tier = tierFor(score);
 
-  // Estimated pipeline value scales with company size and intent quality.
-  const sizeFactor = Math.max(1, Math.log10(employees + 1));
-  const intentFactor = tier === "hot" ? 1.6 : tier === "warm" ? 1.0 : 0.55;
-  const estValue = Math.round((1200 * sizeFactor * intentFactor) / 50) * 50;
+  // Estimated value = course price × probability of closing for this tier.
+  const price = PROGRAM_PRICE[program] ?? 1500;
+  const closeFactor = tier === "hot" ? 1.0 : tier === "warm" ? 0.5 : 0.2;
+  const estValue = Math.round((price * closeFactor) / 50) * 50;
 
   return { score, tier, routedTo: routeFor(tier), estValue };
 }
@@ -110,12 +130,12 @@ export function enrich(
   return {
     name: raw.name ?? "Unknown",
     email: raw.email ?? "unknown@example.com",
-    company: raw.company ?? "Unknown Co.",
-    source: raw.source ?? "Website Form",
+    company: raw.company ?? "Prospective student",
+    source: raw.source ?? "Landing Page",
     channel: raw.channel ?? "web",
     message: raw.message ?? "",
-    intent: raw.intent ?? "other",
-    industry: raw.industry ?? "Other",
+    intent: raw.intent ?? "browsing",
+    industry: raw.industry ?? "Intro to Coding",
     region: raw.region ?? "—",
     employees: raw.employees ?? 1,
     score: r.score,

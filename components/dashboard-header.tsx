@@ -1,8 +1,9 @@
 "use client";
 
-import { Activity, Database, Radio, Zap, Server } from "lucide-react";
+import { Activity, Radio, Zap, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { timeAgo } from "@/lib/format";
 
@@ -12,7 +13,7 @@ interface HeaderProps {
   onToggleLive: () => void;
   onBurst: () => void;
   lastEventTs: number | null;
-  backend?: "upstash" | "memory";
+  backend?: "memory";
 }
 
 export function DashboardHeader({
@@ -33,9 +34,9 @@ export function DashboardHeader({
           </div>
           <div className="leading-tight">
             <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-              FlowDeck
+              EnrollDeck
               <span className="hidden text-muted-foreground sm:inline">
-                · Lead Intake Command Center
+                · Admissions Command Center
               </span>
             </div>
             <div className="text-[11px] text-muted-foreground">
@@ -64,16 +65,9 @@ export function DashboardHeader({
           </div>
 
           {/* Store backend */}
-          <Badge
-            variant={backend === "upstash" ? "success" : "secondary"}
-            className="gap-1.5"
-          >
-            {backend === "upstash" ? (
-              <Database className="h-3 w-3" />
-            ) : (
-              <Server className="h-3 w-3" />
-            )}
-            {backend === "upstash" ? "Upstash Redis" : "In-memory"}
+          <Badge variant="secondary" className="gap-1.5">
+            <Server className="h-3 w-3" />
+            In-memory
           </Badge>
 
           {/* Controls */}
@@ -90,6 +84,7 @@ export function DashboardHeader({
             <Zap className="h-3.5 w-3.5" />
             Simulate burst
           </Button>
+          <ThemeToggle />
         </div>
       </div>
     </header>

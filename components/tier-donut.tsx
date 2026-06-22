@@ -4,9 +4,9 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { ChartTooltip } from "@/components/chart-tooltip";
 
 const TIER_META = [
-  { key: "hot", label: "Hot", color: "hsl(var(--hot))", route: "Senior AE" },
-  { key: "warm", label: "Warm", color: "hsl(var(--warm))", route: "SDR queue" },
-  { key: "cold", label: "Cold", color: "hsl(var(--cold))", route: "Nurture" },
+  { key: "hot", label: "Hot", color: "hsl(var(--hot))", route: "Senior Advisor" },
+  { key: "warm", label: "Warm", color: "hsl(var(--warm))", route: "SDR nurture" },
+  { key: "cold", label: "Cold", color: "hsl(var(--cold))", route: "Email nurture" },
 ] as const;
 
 export function TierDonut({

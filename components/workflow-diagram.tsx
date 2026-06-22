@@ -61,7 +61,7 @@ export function WorkflowDiagram({
         <span className="text-muted-foreground">
           n8n:{" "}
           <span className="font-medium text-foreground">
-            Lead Intake &amp; Routing
+            Lead Capture &amp; Routing
           </span>
         </span>
         {last && (

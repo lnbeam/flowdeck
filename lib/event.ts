@@ -1,8 +1,8 @@
 import type { LeadEvent, RawLead, WorkflowStatus } from "./types";
 import { enrich } from "./scoring";
 
-const WORKFLOW_NAME = "Lead Intake & Routing";
-const ERROR_NODES = ["Enrich Company", "CRM Upsert", "Slack Notify"];
+const WORKFLOW_NAME = "Lead Capture & Routing";
+const ERROR_NODES = ["Enrich Lead", "CRM Upsert", "Calendar Booking"];
 
 function shortId(): string {
   return Math.random().toString(36).slice(2, 8);

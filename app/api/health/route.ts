@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   return NextResponse.json({
     ok: true,
-    service: "flowdeck",
+    service: "enrolldeck",
     backend: backendName(),
     events: await count(),
     authRequired: Boolean(process.env.INGEST_TOKEN),

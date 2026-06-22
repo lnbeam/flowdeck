@@ -1,8 +1,8 @@
 {
-  "name": "flowdeck",
+  "name": "enrolldeck",
   "version": "1.0.0",
   "private": true,
-  "description": "FlowDeck — Lead Intake Command Center. A live dashboard wired to an n8n automation workflow.",
+  "description": "EnrollDeck — Admissions Command Center. A live dashboard wired to an n8n coding-bootcamp lead workflow.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -15,37 +15,35 @@ const EVERY = Number(process.env.EVERY_MS || 4000);
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 const FIRST = ["Maya", "Liam", "Sofia", "Noah", "Aria", "Ethan", "Zoe", "Lucas", "Omar", "Elena", "Kai", "Priya"];
 const LAST = ["Reed", "Vance", "Okoro", "Holt", "Marsh", "Patel", "Sterling", "Khan", "Rossi", "Frost"];
-const HEAD = ["Northwind", "Lumen", "Cobalt", "Vertex", "Helios", "Beacon", "Quanta", "Meridian", "Arbor"];
-const TAIL = ["Labs", "Systems", "Group", "Technologies", "Digital", "Capital", "Logistics"];
-const SOURCES = [["Website Form", "web"], ["LinkedIn Ad", "paid"], ["Partner Referral", "referral"], ["Organic Search", "organic"], ["Cold Outbound Reply", "outbound"]];
-const INTENTS = ["demo", "pricing", "evaluation", "partnership", "support", "job", "other"];
-const INDUSTRIES = ["SaaS", "Fintech", "Healthcare", "Ecommerce", "Manufacturing", "Agency", "Logistics", "Other"];
-const REGIONS = ["North America", "Europe", "UK & Ireland", "APAC", "LATAM"];
+const PERSONAS = ["Career switcher", "Recent grad", "Self-taught dev", "Junior developer", "Marketing specialist", "Product designer", "Freelancer", "University student", "Bootcamp shopper"];
+const SOURCES = [["Landing Page", "web"], ["Free Trial Lesson", "organic"], ["Webinar Signup", "webinar"], ["Instagram Ad", "paid"], ["Student Referral", "referral"], ["Cold Email Reply", "outbound"]];
+const INTENTS = ["enroll-now", "book-call", "financing", "pricing", "syllabus", "free-lesson", "newsletter", "browsing"];
+const PROGRAMS = ["Web Development", "Data Science", "DevOps", "Cybersecurity", "UX/UI Design", "QA Automation", "Digital Marketing", "Intro to Coding"];
+const FORMATS = ["Full-time", "Part-time", "Evening", "Weekend", "Self-paced"];
+const DOMAINS = ["gmail.com", "outlook.com", "icloud.com", "proton.me"];
 
-function emp() {
+function visits() {
   const r = Math.random();
-  if (r < 0.45) return 5 + Math.floor(Math.random() * 45);
-  if (r < 0.75) return 50 + Math.floor(Math.random() * 200);
-  if (r < 0.9) return 250 + Math.floor(Math.random() * 750);
-  return 1000 + Math.floor(Math.random() * 8000);
+  if (r < 0.45) return 1 + Math.floor(Math.random() * 2);
+  if (r < 0.78) return 2 + Math.floor(Math.random() * 3);
+  if (r < 0.93) return 4 + Math.floor(Math.random() * 4);
+  return 8 + Math.floor(Math.random() * 7);
 }
 
 function gen() {
-  const first = pick(FIRST), last = pick(LAST), head = pick(HEAD);
-  const employees = emp();
+  const first = pick(FIRST), last = pick(LAST), program = pick(PROGRAMS);
   const src = pick(SOURCES);
-  const domain = Math.random() < 0.25 ? pick(["gmail.com", "outlook.com"]) : `${head.toLowerCase()}.com`;
   return {
     name: `${first} ${last}`,
-    email: `${first.toLowerCase()}.${last.toLowerCase()}@${domain}`,
-    company: `${head} ${pick(TAIL)}`,
+    email: `${first.toLowerCase()}.${last.toLowerCase()}@${pick(DOMAINS)}`,
+    company: pick(PERSONAS),
     source: src[0],
     channel: src[1],
-    message: "Interested — please reach out.",
+    message: "Interested in enrolling — please reach out.",
     intent: pick(INTENTS),
-    industry: pick(INDUSTRIES),
-    region: pick(REGIONS),
-    employees,
+    industry: program,
+    region: pick(FORMATS),
+    employees: visits(),
   };
 }
 

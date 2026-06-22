@@ -7,8 +7,8 @@ import { initials, timeAgo } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const routeShort: Record<Tier, string> = {
-  hot: "Senior AE",
-  warm: "SDR queue",
+  hot: "Advisor",
+  warm: "SDR",
   cold: "Nurture",
 };
 const tierAvatar: Record<Tier, string> = {
