@@ -91,33 +91,39 @@ The dashboard moves on its own (built-in simulator), but the point of the assess
 the **real n8n → dashboard connection**. This is the exact, tested path. Keep the
 dashboard from [Run locally](#run-locally) running on `http://localhost:3000` first.
 
-### 1. Start n8n (Docker)
+### 1. Start n8n (Docker Compose)
 
-n8n is a stateful long-running server, so it can't run on Vercel — run it locally:
+n8n is a stateful long-running server, so it can't run on Vercel — run it locally. A
+[`docker-compose.yml`](docker-compose.yml) is included (n8n + the right env, persistent
+volume, `host.docker.internal` mapping):
 
 ```bash
-docker run -d --name enrolldeck-n8n -p 5678:5678 \
-  -e DASHBOARD_URL=http://host.docker.internal:3000 \
-  -e INGEST_TOKEN= \
-  -e N8N_BLOCK_ENV_ACCESS_IN_NODE=false \
-  -e N8N_SECURE_COOKIE=false \
-  -v n8n_data:/home/node/.n8n \
-  n8nio/n8n
+docker compose up -d            # n8n at http://localhost:5678
 ```
 
-Open `http://localhost:5678` and create the owner account (any email + password — it's a
+Open `http://localhost:5678` and create the owner account (any email + password — a
 local login, unrelated to the dashboard).
 
-> **Why these env vars?** The **POST to Dashboard** node reads `{{ $env.DASHBOARD_URL }}`
-> and `{{ $env.INGEST_TOKEN }}` — n8n **environment variables**, *not* n8n *Variables*
-> (Settings → Variables is a paid feature). Pass them with `-e` as above.
+**By default it targets your LOCAL dashboard** (`http://host.docker.internal:3000`). To
+point the **POST to Dashboard** node at your **deployed** dashboard, set `DASHBOARD_URL`
+(and `INGEST_TOKEN` if you enabled auth) — via shell env or a `.env` file next to
+`docker-compose.yml`:
+
+```bash
+DASHBOARD_URL=https://<your-app>.vercel.app docker compose up -d
+```
+
+> **Env, not n8n Variables.** The node reads `{{ $env.DASHBOARD_URL }}` and
+> `{{ $env.INGEST_TOKEN }}` — process **environment variables** (compose injects them),
+> *not* n8n *Variables* (Settings → Variables is a paid feature). That's why
+> `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` is set in the compose file. **Both values fall back
+> to sensible defaults** if unset: the local dashboard and an empty token (auth off).
 >
-> **Use `host.docker.internal`, not `localhost`.** Inside the container `localhost` is the
-> container itself; `host.docker.internal:3000` reaches the dashboard on your machine
-> (Docker Desktop for Mac/Windows). On Linux add `--add-host=host.docker.internal:host-gateway`.
+> **`host.docker.internal`, not `localhost`** — inside the container `localhost` is the
+> container itself; `host.docker.internal` reaches your machine (the compose file maps it
+> for Linux too). For a deployed dashboard this doesn't apply — it's a public URL.
 >
-> `INGEST_TOKEN` is empty because local dev runs with auth off. If you set `INGEST_TOKEN`
-> on the dashboard, set the **same** value here.
+> `docker compose down` stops n8n; the `n8n_data` volume (workflow + account) is kept.
 
 ### 2. Import the workflow
 

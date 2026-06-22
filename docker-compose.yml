@@ -1,0 +1,31 @@
+# n8n for the EnrollDeck demo workflow.
+#
+#   docker compose up -d        # start n8n (open http://localhost:5678)
+#   docker compose down         # stop (the n8n_data volume — workflow + account — is kept)
+#
+# Env values fall back to sensible defaults if not provided. Override them via your
+# shell environment or a `.env` file next to this file (see .env.example):
+#   - DASHBOARD_URL — where the "POST to Dashboard" node sends leads. Defaults to the
+#     LOCAL dev dashboard, reached via host.docker.internal from inside the container.
+#     Set it to your deployed URL (e.g. https://<app>.vercel.app) to target production.
+#   - INGEST_TOKEN — must match the dashboard's token; empty = ingest auth off.
+services:
+  n8n:
+    image: n8nio/n8n
+    container_name: enrolldeck-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      # The "POST to Dashboard" HTTP node reads these via {{ $env.* }}.
+      DASHBOARD_URL: ${DASHBOARD_URL:-http://host.docker.internal:3000}
+      INGEST_TOKEN: ${INGEST_TOKEN:-}
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"   # allow $env access inside nodes
+      N8N_SECURE_COOKIE: "false"              # allow login over http://localhost
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # required on Linux; harmless on Mac/Win
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
+    name: n8n_data
