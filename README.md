@@ -11,7 +11,7 @@ execution monitor.
 
 - **Live demo:** `https://<your-app>.vercel.app` _(add after deploy)_
 - **Workflow export:** [`n8n/lead-intake-workflow.json`](n8n/lead-intake-workflow.json)
-- **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind + shadcn/ui · Recharts · GSAP · n8n
+- **Stack:** Next.js 15 (App Router) · React 19 · TypeScript · Tailwind + shadcn/ui · Recharts · GSAP · n8n
 
 ---
 
